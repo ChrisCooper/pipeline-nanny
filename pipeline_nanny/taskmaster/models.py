@@ -8,15 +8,38 @@ class JobGroup(models.Model):
 		return Job.objects.create(group=self, **args)
 
 	def __repr__(self):
-		return "Job group: (" + ", ".join(self.jobs) + ")"
+		return "<Job group: (" + ", ".join(self.jobs) + ")>"
+
+	#def ready_jobs(self):
+		#return self.jobs.
 
 class Job(models.Model):
 	name = models.TextField()
-	group = models.ForeignKey('JobGroup')
+	group = models.ForeignKey('JobGroup', related_name='jobs')
 	child_jobs = models.ManyToManyField('self', symmetrical=False, related_name='parent_jobs')
+
+	WAITING = 0
+	READY = 1
+	RUNNING = 2
+	COMPLETED = 3
+	ERRORED = 4
+	KILLED = 5
+	STATES = (
+		(WAITING, 'Waiting'), # waiting on parent jobs
+		(READY, 'Ready'), # Can be started any time
+		(RUNNING, 'Running'), # Has been started
+		(COMPLETED, 'Completed'), # Exited with zero code
+		(ERRORED, 'Errored-out'), # Exited with a non-zero status
+		(KILLED, 'Killed'), # Used too many resources and was killed
+	)
+	state = models.IntegerField(choices=STATES, default=READY)
    
 	def __repr__(self):
-		return "<Job: {0}, {1} parents, {2} children>".format(self.name, self.parent_jobs.count(), self.child_jobs.count())
+		return "<{state} Job: {name}, {n_parents} parents, {n_children} children>".format(
+			state=self.get_state_display(),
+			name=self.name,
+			n_parents=self.parent_jobs.count(),
+			n_children=self.child_jobs.count())
 	
 	def add_child(self, dependant_job):
 		if dependant_job == self:
@@ -55,6 +78,5 @@ class Job(models.Model):
 				return True
 		return False
 
-
 class InvalidDependencyException(Exception):
-    pass
+	pass
