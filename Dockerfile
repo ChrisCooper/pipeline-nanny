@@ -11,9 +11,10 @@ ADD pipeline_nanny /pipeline_nanny
 
 RUN python3 /pipeline_nanny/manage.py syncdb --noinput
 
+RUN python3 /pipeline_nanny/manage.py test --verbosity=2 taskmaster
+
 EXPOSE 8000
 
-CMD ["python3", "/pipeline_nanny/manage.py", "test", "--verbosity=2", "taskmaster"]
-#CMD ["python3", "/pipeline_nanny/manage.py", "runserver", "0.0.0.0:8000"]
+CMD ["python3", "/pipeline_nanny/manage.py", "runserver", "0.0.0.0:8000"]
 
 # sudo docker build -t pnan . && sudo docker run -p 127.0.0.1:8000:8000 pnan
