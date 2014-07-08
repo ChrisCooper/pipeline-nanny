@@ -1,4 +1,4 @@
-from django.shortcuts import render, get_object_or_404
+from django.shortcuts import render, get_object_or_404, redirect
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 
 from taskmaster.models import *
@@ -18,3 +18,13 @@ def jobgroups(request):
 		groups = paginator.page(paginator.num_pages)
 
 	return render(request, 'taskmaster/job_groups.html', {"groups": groups})
+
+def kickstart(request):
+	'''Creates a bunch of models to mess around with'''
+
+	group = JobGroup.objects.create(name="pizza maker group")
+	job1 = group.new_job(name="tony job")
+	job2 = group.new_job(name="steve job")
+	job3 = group.new_job(name="charlie job")
+
+	return redirect('jobgroups')
