@@ -48,8 +48,10 @@ class Job(models.Model):
 			raise InvalidDependencyException("Error: Dependency loops are not allowed. {0} already depends on {1}".format(self, dependant_job))
 		if dependant_job in self.child_jobs.all():
 			raise InvalidDependencyException("Error: Child job has already been added. {1} already depends on {0}".format(self, dependant_job))
+		if self.status not in (Job.READY, Job.WAITING):
+			raise InvalidDependencyException("Error: Can't add a child to a parent job that's already started. {0} already running (child: {1})".format(self, dependant_job))
 		if dependant_job.status not in (Job.READY, Job.WAITING):
-			raise InvalidDependencyException("Error: Can't add a child job that's already started. {0} already running (parent: {1})".format(dependant_job, self))
+			raise InvalidDependencyException("Error: Can't add a child job that's already started. {1} already running (parent: {0})".format(self, dependant_job))
 	   
 		self.child_jobs.add(dependant_job)
 		dependant_job.status = Job.WAITING
