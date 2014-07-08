@@ -2,13 +2,16 @@ from django.db import models
 
 class JobGroup(models.Model):
 	name = models.TextField()
-	date_Created = models.DateTimeField('date created', auto_now_add=True)
+	date_created = models.DateTimeField('date created', auto_now_add=True)
 
 	def new_job(self, **args):
 		return Job.objects.create(group=self, **args)
 
 	def __repr__(self):
-		return "<Job group: (" + ", ".join(self.jobs) + ")>"
+		return "<Job group: {name} ({n_jobs} jobs)>".format(name=self.name, n_jobs=self.jobs.count())
+
+	def __str__(self):
+		return self.__repr__()
 
 	#def ready_jobs(self):
 		#return self.jobs.
@@ -55,6 +58,8 @@ class Job(models.Model):
 	   
 		self.child_jobs.add(dependant_job)
 		dependant_job.status = Job.WAITING
+		self.save()
+		dependant_job.save()
 
 	def add_parent(self, prerequisite_job):
 		prerequisite_job.add_child(self)

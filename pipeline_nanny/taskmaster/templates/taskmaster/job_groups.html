@@ -1,6 +1,6 @@
 {% if groups %}
     {% for group in groups %}
-        {{ group.name }}<br />
+        <a href="{% url 'jobgroup' group.id %}">{{ group }}</a><br />
     {% endfor %}
 
     <div class="pagination">
