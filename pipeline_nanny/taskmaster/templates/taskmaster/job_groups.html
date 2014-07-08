@@ -1,0 +1,26 @@
+{% if groups %}
+    {% for group in groups %}
+        {{ group.name }}<br />
+    {% endfor %}
+
+    <div class="pagination">
+        <span class="step-links">
+            {% if groups.has_previous %}
+                <a href="?page={{ groups.previous_page_number }}">previous</a>
+            {% endif %}
+
+            <span class="current">
+                Page {{ groups.number }} of {{ groups.paginator.num_pages }}.
+            </span>
+
+            {% if groups.has_next %}
+                <a href="?page={{ groups.next_page_number }}">next</a>
+            {% endif %}
+        </span>
+    </div>
+{% else %}
+    No job groups to display.
+{% endif %}
+
+
+
