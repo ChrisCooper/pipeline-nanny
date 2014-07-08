@@ -50,11 +50,10 @@ class DependencyTestCase(TestCase):
 		self.assertEqual(j2.status, Job.WAITING, "Child job is waiting")
 
 	def test_status_refuses_adding_dependencies(self):
-		"""Depndencies can't be added unless the job's status is Ready or Waiting"""
+		"""Depndencies can't be added unless both jobs' statuses are Ready or Waiting"""
 		j1, j2, j3 = self.job1, self.job2, self.job3
-		running_job = self.group.new_job(name="usain job", status=Job.RUNNING)
 
-		self.assertRaises(InvalidDependencyException, lambda: j1.add_child(running_job))
-
-	# def test_refuse_adding_children_to_started_jobs(self):
-	# 	"""Child jobs can't be added to jobs that have already started"""
+		for invalid_status in (Job.RUNNING, Job.RUNNING, Job.COMPLETED, Job.ERRORED, Job.KILLED):
+			invalid_job = self.group.new_job(name="poor job", status=invalid_status)
+			self.assertRaises(InvalidDependencyException, lambda: j1.add_child(invalid_job))
+			self.assertRaises(InvalidDependencyException, lambda: invalid_job.add_child(j1))
