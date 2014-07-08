@@ -49,22 +49,12 @@ class DependencyTestCase(TestCase):
 		self.assertEqual(j1.status, Job.READY, "Parent job is Ready")
 		self.assertEqual(j2.status, Job.WAITING, "Child job is waiting")
 
-	# def test_status_refuses_adding_dependencies(self):
-	# 	"""Depndencies can't be added unless a job is in the Ready or Waiting state"""
-	# 	j1, j2, j3 = self.job1, self.job2, self.job3
+	def test_status_refuses_adding_dependencies(self):
+		"""Depndencies can't be added unless the job's status is Ready or Waiting"""
+		j1, j2, j3 = self.job1, self.job2, self.job3
+		running_job = self.group.new_job(name="usain job", status=Job.RUNNING)
 
-	# 	self.assertEquals(j1.status, Job.READY)
+		self.assertRaises(InvalidDependencyException, lambda: j1.add_child(running_job))
 
-	# 	j1.add_child(j2)
-	# 	j2.add_child(j3)
-
-	# 	self.assertTrue(j2.depends_on(j1), "simple dependency detected")
-	# 	self.assertFalse(j1.depends_on(j2), "simple reverse-dependency ignored")
-
-	# 	self.assertTrue(j3.depends_on(j1), "extended dependency detected")
-	# 	self.assertFalse(j1.depends_on(j3), "extended reverse-dependency ignored")
-
-	# 	self.assertFalse(j1.depends_on(j1), "no self dependency exists")
-
-	# def test_refuse_adding_children_to_completed_jobs(self):
-	# 	"""Child jobs can't be added to jobs that have already completed"""
+	# def test_refuse_adding_children_to_started_jobs(self):
+	# 	"""Child jobs can't be added to jobs that have already started"""
