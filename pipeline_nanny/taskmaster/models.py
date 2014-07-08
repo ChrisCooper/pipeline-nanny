@@ -24,7 +24,7 @@ class Job(models.Model):
 	COMPLETED = 3
 	ERRORED = 4
 	KILLED = 5
-	STATES = (
+	STATUSES = (
 		(WAITING, 'Waiting'), # waiting on parent jobs
 		(READY, 'Ready'), # Can be started any time
 		(RUNNING, 'Running'), # Has been started
@@ -32,11 +32,11 @@ class Job(models.Model):
 		(ERRORED, 'Errored-out'), # Exited with a non-zero status
 		(KILLED, 'Killed'), # Used too many resources and was killed
 	)
-	state = models.IntegerField(choices=STATES, default=READY)
+	status = models.IntegerField(choices=STATUSES, default=READY)
    
 	def __repr__(self):
-		return "<{state} Job: {name}, {n_parents} parents, {n_children} children>".format(
-			state=self.get_state_display(),
+		return "<{status} Job: {name}, {n_parents} parents, {n_children} children>".format(
+			status=self.get_status_display(),
 			name=self.name,
 			n_parents=self.parent_jobs.count(),
 			n_children=self.child_jobs.count())
@@ -47,19 +47,15 @@ class Job(models.Model):
 		if self.depends_on(dependant_job):
 			raise InvalidDependencyException("Error: Dependency loops are not allowed. {0} already depends on {1}".format(self, dependant_job))
 		if dependant_job in self.child_jobs.all():
-			raise InvalidDependencyException("Error: Child job has already been added. {0} already depends on {1}".format(dependant_job, self))
+			raise InvalidDependencyException("Error: Child job has already been added. {1} already depends on {0}".format(self, dependant_job))
+		# if dependant_job.status not in (READY, WAITING):
+		# 	raise InvalidDependencyException("Error: Can't add a child job that's already started. {0} already running (parent: {1})".format(dependant_job, self))
 	   
 		self.child_jobs.add(dependant_job)
+		dependant_job.status = Job.WAITING
 
 	def add_parent(self, prerequisite_job):
-		if prerequisite_job == self:
-			raise InvalidDependencyException("Error: Can't add a job as its own parent. Job is {0}".format(self))
-		if prerequisite_job.depends_on(self):
-			raise InvalidDependencyException("Error: Dependency loops are not allowed. {0} already depends on {1}".format(prerequisite_job, self))
-		if prerequisite_job in self.parent_jobs.all():
-			raise InvalidDependencyException("Error: Parent job has already been added. {0} already depends on {1}".format(self, prerequisite_job))
-	   
-		self.parent_jobs.add(prerequisite_job)
+		prerequisite_job.add_child(self)
 
 	def add_parents(self, prerequisite_jobs):
 		for job in prerequisite_jobs:
