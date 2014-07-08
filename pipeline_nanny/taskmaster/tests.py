@@ -10,12 +10,15 @@ class DependencyTestCase(TestCase):
 
 	def test_adding_self(self):
 		"""Jobs can't be self-dependent"""
-		j = self.job1
-		with self.assertRaises(InvalidDependencyException):
-			j.add_parent(j)
+		j1, j2, j3 = self.job1, self.job2, self.job3
 
-		with self.assertRaises(InvalidDependencyException):
-			j.add_child(j)
+		self.assertRaises(InvalidDependencyException, lambda: j1.add_parent(j1))
+		self.assertRaises(InvalidDependencyException, lambda: j1.add_child(j1))
+
+		j1.add_child(j2)
+		j2.add_child(j3)
+
+		self.assertRaises(InvalidDependencyException, lambda: j3.add_child(j1))
 
 	def test_depends_on(self):
 		"""The depends_on method can follow relationships"""
