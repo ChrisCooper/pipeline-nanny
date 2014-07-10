@@ -1,6 +1,12 @@
+{% extends "pipeline_nanny/base-fixed.html" %}
+
+{% block body_content %}
+
 <div class="group-info">
     {{ group }}
 </div>
 
 
 <br /><br /><a href="{% url 'jobgroups' %}">Back to all job groups!</a>
+
+{% endblock %}

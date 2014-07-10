@@ -1,3 +1,7 @@
+{% extends "pipeline_nanny/base-fixed.html" %}
+
+{% block body_content %}
+
 {% if groups %}
     {% for group in groups %}
         <a href="{% url 'jobgroup' group.id %}">{{ group }}</a><br />
@@ -22,5 +26,7 @@
     No job groups to display.
 {% endif %}
 
-
 <br /><br /><a href="{% url 'kickstart' %}">Kickstart!</a>
+
+{% endblock %}
+
