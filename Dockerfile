@@ -20,3 +20,4 @@ EXPOSE 8000
 CMD ["python3", "/pipeline_nanny/manage.py", "runserver", "0.0.0.0:8000"]
 
 # sudo docker build -t pnan . && sudo docker run -p 127.0.0.1:8000:8000 -v /home/ccooper/repos/pipeline-nanny/pipeline_nanny:/pipeline_nanny pnan
+# sudo docker build -t pnan . && sudo docker run -p 127.0.0.1:8000:8000 -v /home/chris/programming/repos/pipeline-nanny/pipeline_nanny:/pipeline_nanny pnan
