@@ -2,7 +2,7 @@ from django.db import models
 
 class JobGroup(models.Model):
 	name = models.TextField()
-	date_created = models.DateTimeField('date created', auto_now_add=True)
+	nanny_creation_date = models.DateTimeField('date created', auto_now_add=True)
 
 	def new_job(self, **args):
 		return Job.objects.create(group=self, **args)
@@ -20,7 +20,12 @@ class Job(models.Model):
 	name = models.TextField()
 	group = models.ForeignKey('JobGroup', related_name='jobs')
 	child_jobs = models.ManyToManyField('self', symmetrical=False, related_name='parent_jobs')
-
+    nanny_creation_date = models.DateTimeField('date created', auto_now_add=True)
+    
+    command = models.TextField()
+    stdout_file_location = models.TextField()
+    stderr_file_location = models.TextField()
+    
 	WAITING = 0
 	READY = 1
 	RUNNING = 2

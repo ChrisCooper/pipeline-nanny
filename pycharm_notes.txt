@@ -1,0 +1,6 @@
+Ctrl-Al-R - manage.py task
+Shift-F10 - runserver
+
+
+Ctrl-N       - Go to class
+Ctrl-Shift-N - Go to file
